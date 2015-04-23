@@ -1,14 +1,17 @@
 <?php
+/* Author : Nur Hidayatullah
+ * Created : 22 Apr 2015
+ */
 class Voted_perceptron{
 	
-	function train($data_latih,$label,$max_epoh){
+	function train($data_latih,$label,$max_epoh){ //fungsi pelatihan untuk mencari nilai v,c,dan k
 		$v = array(array_fill(0,count($data_latih[0]),0));
 		$k = 0;
 		$c = array(0);
 		for($iterasi = 0;$iterasi < $max_epoh;$iterasi++){
 			$cek= "";
 			for($x = 0;$x<count($data_latih);$x++){
-				$y = $this->sign($data_latih[$x],$v[$k]);
+				$y = $this->dot_product($data_latih[$x],$v[$k]);
 				if($y ==$label[$x]){
 					$c[$k] = $c[$k]+1;
 					$cek .=1;
@@ -28,15 +31,10 @@ class Voted_perceptron{
 				$iterasi = $max_epoh;
 			}
 		}
-		echo "V : ";
-		print_r($v);
-		echo "</br>";
-		echo "Bobot : ";
-		print_r($c);
-		echo "</br>K : ".$k;
+		$out = array('v'=>$v,'c'=>$c,'k'=>$k);
+		return $out;
 	}
-	function sign($data,$v){
-		$y_in = $this->dot_product($data,$v);
+	function sign($y_in){ // aktivasi
 		if($y_in > 0){
 			$y = 1;
 		}else{
@@ -49,11 +47,27 @@ class Voted_perceptron{
 		for($x = 0;$x < count($data);$x++){
 			$y_in = $y_in + ($data[$x]*$v[$x]);
 		}
-		return $y_in;		
+		return $this->sign($y_in);	
+	}
+	function classifier($data,$v,$c,$k){ // fungsi untuk klasifikasi
+		$s = 0;
+		for($x = 0;$x <= $k;$x++){
+			$y_in = 0;
+			$row = 0;
+			for($y=0;$y<count($v[$x]);$y++){
+				$y_in = $y_in +($v[$x][$y]*$data[$y]);
+				$row++;
+			}
+			$s = $s +($c[$x]*$this->sign($y_in));echo $s;
+		}
+		return $this->sign($s);
 	}
 }
-$data = array(array(-1,-1,-1),array(-1,1,-1),array(1,1,-1),array(1,1,1));
-$label = array(-1,-1,-1,1);
+$data = array(array(-1,-1),array(-1,1),array(1,-1),array(1,1)); // data latih
+$label = array(-1,-1,-1,1); // target label data latih
 $voted = new Voted_perceptron;
-$voted->train($data,$label,5);
+$out = $voted->train($data,$label,5); //melakukan proses training
+$uji = array(1,1);	//data uji
+$hasil = $voted->classifier($uji,$out['v'],$out['c'],$out['k']); //melakukan klasifikasi
+echo $hasil;
 ?>
