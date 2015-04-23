@@ -7,8 +7,8 @@ class Voted_perceptron{
 	function train($data_latih,$label,$max_epoh){ //fungsi pelatihan untuk mencari nilai v,c,dan k
 		$v = array(array_fill(0,count($data_latih[0]),0));
 		$k = 0;
-		$c = array(0);
-		for($iterasi = 0;$iterasi < $max_epoh;$iterasi++){
+		$c = array(1);
+		for($iterasi = 0;$iterasi <= $max_epoh;$iterasi++){
 			$cek= "";
 			for($x = 0;$x<count($data_latih);$x++){
 				$y = $this->dot_product($data_latih[$x],$v[$k]);
@@ -26,8 +26,8 @@ class Voted_perceptron{
 					$cek .=0;
 				}
 			}
-			$y = strpos($cek,"0");
-			if(empty($y)){
+			$ck = strpos($cek,"0");
+			if($ck===FALSE){
 				$iterasi = $max_epoh;
 			}
 		}
@@ -58,16 +58,20 @@ class Voted_perceptron{
 				$y_in = $y_in +($v[$x][$y]*$data[$y]);
 				$row++;
 			}
-			$s = $s +($c[$x]*$this->sign($y_in));echo $s;
+			$s = $s +($c[$x]*$this->sign($y_in));
 		}
 		return $this->sign($s);
 	}
 }
-$data = array(array(-1,-1),array(-1,1),array(1,-1),array(1,1)); // data latih
-$label = array(-1,-1,-1,1); // target label data latih
+$data = array(array(1,1),array(1,-1),array(-1,1),array(-1,-1)); // data latih
+$label = array(1,-1,-1,-1); // target label data latih
 $voted = new Voted_perceptron;
 $out = $voted->train($data,$label,5); //melakukan proses training
-$uji = array(1,1);	//data uji
-$hasil = $voted->classifier($uji,$out['v'],$out['c'],$out['k']); //melakukan klasifikasi
-echo $hasil;
+$uji = array(array(-1,-1),array(-1,1),array(1,-1),array(1,1));	//data uji
+for($x=0;$x<count($uji);$x++){
+	$hasil = $voted->classifier($uji[$x],$out['v'],$out['c'],$out['k']); //melakukan klasifikasi
+	echo "Data ".($x+1)." ";
+	print_r($uji[$x]);
+	echo "  Hasil : ".$hasil."</br>";
+}
 ?>
