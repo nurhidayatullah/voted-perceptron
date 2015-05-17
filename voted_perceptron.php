@@ -67,6 +67,11 @@ $data = array(array(1,1),array(1,-1),array(-1,1),array(-1,-1)); // data latih
 $label = array(1,-1,-1,-1); // target label data latih
 $voted = new Voted_perceptron;
 $out = $voted->train($data,$label,5); //melakukan proses training
+//hasil training
+/*echo "<pre>";
+print_r($out);
+echo "</pre>";*/
+//------------
 $uji = array(array(-1,-1),array(-1,1),array(1,-1),array(1,1));	//data uji
 for($x=0;$x<count($uji);$x++){
 	$hasil = $voted->classifier($uji[$x],$out['v'],$out['c'],$out['k']); //melakukan klasifikasi
